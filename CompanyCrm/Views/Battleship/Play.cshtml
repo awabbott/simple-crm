@@ -1,0 +1,84 @@
+﻿@model CustomerModels.Battleship.Game
+
+@{
+    ViewData["Title"] = "Play";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <link rel="stylesheet" href="~/css/battleship.css" />
+</head>
+
+<h1>Start Game: @Model.GameId</h1>
+
+<div class="flex-container">
+    <div class="board">
+        <h2>User's Board</h2>
+        @for (int i = 0; i < 10; i++)
+        {
+            @for (int j = 0; j < 10; j++)
+             {
+                <button type="button" id="user: @i, @j" class="cell" onclick="shotFired(@Model.GameId, true, @i, @j)">
+                    @foreach (var ship in Model.Ships)
+                    {
+                        if (ship.BelongsToUser)
+                        {
+                            foreach (var coordinate in ship.Coordinates)
+                            {
+                                if (i == coordinate.Row && j == coordinate.Column)
+                                {
+                                    @ship.Name
+                                }
+                            }
+                        }
+                    }
+                </button>
+             }
+            <br />
+        }
+    </div>
+    <div class="board">
+        <h2>Opponent's Board</h2>
+        <div id="opponentGridAJAX">
+            @for (int i = 0; i < 10; i++)
+            {
+                @for (int j = 0; j < 10; j++)
+                {
+                    <button type="button" id="opponent: @i, @j" class="cell" onclick="shotFired(@Model.GameId, false, @i, @j)"></button>
+                }
+                <br />
+            }
+        </div>
+    </div>
+</div>
+
+<div id="OpponentShipsGrid">
+    <h4>Cheat mode</h4>
+    <table border="1">
+        <tbody>
+            @for (int i = 0; i < 10; i++)
+            {
+                <tr>
+                    @for (int j = 0; j < 10; j++)
+                    {
+                        <td id="@i@j">
+                            @foreach (var ship in Model.Ships)
+                            {
+                                if (!ship.BelongsToUser)
+                                {
+                                    foreach (var coordinate in ship.Coordinates)
+                                    {
+                                        if (i == coordinate.Row && j == coordinate.Column)
+                                        {
+                                            @ship.Name
+                                        }
+                                    }
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script src="~/js/battleshipPlay.js"></script>

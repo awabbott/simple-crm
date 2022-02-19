@@ -1,0 +1,45 @@
+﻿@model AddressModel
+
+<h2>@Model.AddressType address for Customer ID: @Model.CustomerId</h2>
+
+@Html.HiddenFor(a => a.AddressId);
+
+<div class="thumbnail">
+    <div class="caption-full">
+        <table>
+            <tr>
+                <th>Address Type</th>
+                <td>@Model.AddressType</td>
+            </tr>
+            <tr>
+                <th>Street Line 1</th>
+                <td>@Model.StreetLine1</td>
+            </tr>
+            <tr>
+                <th>Street Line 2</th>
+                <td>@Model.StreetLine2</td>
+            </tr>
+            <tr>
+                <th>City / Region</th>
+                <td>@Model.City</td>
+            </tr>
+            <tr>
+                <th>Country</th>
+                <td>@Model.Country</td>
+            </tr>
+            <tr>
+                <th>Postal Code</th>
+                <td>@Model.PostalCode</td>
+            </tr>
+            <tr>
+                <th>Associated Customer ID</th>
+                <td>@Model.CustomerId</td>
+            </tr>
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-controller="Customers" asp-route-id="@Model.CustomerId">Back to List</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

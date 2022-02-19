@@ -1,0 +1,83 @@
+﻿@model CustomerModel
+
+<h2>@Model.FullName</h2>
+
+<div class="thumbnail">
+    <div class="caption-full">
+        <table>
+            <tr>
+                <th>Id</th>
+                <td>@Model.CustomerId</td>
+            </tr>
+            <tr>
+                <th>First Name</th>
+                <td>@Model.FirstName</td>
+            </tr>
+            <tr>
+                <th>Last Name</th>
+                <td>@Model.LastName</td>
+            </tr>
+            <tr>
+                <th>Age</th>
+                <td>@Model.Age</td>
+            </tr>
+            <tr>
+                <th>Gender</th>
+                <td>@Model.Gender</td>
+            </tr>
+            <tr>
+                <th>Education Level</th>
+                <td>@Model.Education</td>
+            </tr>
+            <tr>
+                <th>Interests</th>
+                <td>@Model.Interests</td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td>@Model.Phone</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>@Model.Email</td>
+            </tr>
+            <tr>
+                <th>Date Submitted</th>
+                <td>@Model.DateSubmitted</td>
+            </tr>
+        </table>
+        <br>
+        <div><a asp-controller="Addresses" asp-action="Create" asp-route-id="@Model.CustomerId">Add New Address</a></div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Address Type
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var address in Model.Addresses)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => address.AddressType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => address.StreetLine1)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-controller="Addresses" asp-route-id="@address.AddressId">Details</a> |
+                            <a asp-action="Delete" asp-controller="Addresses" asp-route-id="@address.AddressId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <span><a asp-action="List">Back to Customer List</a></span>
+    </div>
+</div>

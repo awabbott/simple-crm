@@ -1,0 +1,9 @@
+C:\CSProjects\Architech\Project3\CustomerModels\bin\Debug\netcoreapp3.1\CustomerModels.deps.json
+C:\CSProjects\Architech\Project3\CustomerModels\bin\Debug\netcoreapp3.1\CustomerModels.dll
+C:\CSProjects\Architech\Project3\CustomerModels\bin\Debug\netcoreapp3.1\CustomerModels.pdb
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.csproj.AssemblyReference.cache
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.AssemblyInfoInputs.cache
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.AssemblyInfo.cs
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.csproj.CoreCompileInputs.cache
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.dll
+C:\CSProjects\Architech\Project3\CustomerModels\obj\Debug\netcoreapp3.1\CustomerModels.pdb

@@ -1,0 +1,134 @@
+﻿@model AddressModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+    <div>
+<form asp-action="Delete" method="post" class="form-horizontal" role="form">
+    @Html.AntiForgeryToken()
+    
+    @Html.HiddenFor(a => a.AddressId)
+    @Html.HiddenFor(a => a.CustomerId)
+
+    <h3>Are you sure you want to delete this customer?</h3>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.AddressType)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.AddressType)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.StreetLine1)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.StreetLine1)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.StreetLine2)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.StreetLine2)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.City)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.City)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.State)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.State)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Country)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Country)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PostalCode)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PostalCode)
+            </dd>
+        </dl>
+
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Details" asp-controller="Customers" asp-route-id="@Model.CustomerId">Back to Customer Profile</a>
+</form>
+</div>
+
+
+@*<form asp-action="Delete" method="post" class="form-horizontal" role="form">
+
+        @Html.HiddenFor(a => a.CustomerId);
+
+        <h3>Are you sure you want to delete this address?</h3>
+        <hr />
+
+        <div class="form-group">
+            @foreach (CustomerModels.AddressType addrType in Enum.GetValues(typeof(CustomerModels.AddressType)))
+            {
+                <input type="radio" asp-for="AddressType" value="@addrType" />@addrType<br />
+            }
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StreetLine1" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="StreetLine1" class="form-control" />
+            </div>
+            <span asp-validation-for="StreetLine1" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StreetLine2" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="StreetLine2" class="form-control" />
+            </div>
+            <span asp-validation-for="StreetLine2" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(x => Model.SelectedCountry, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(x => Model.SelectedCountry, new SelectList(Model.Countries, "Value", "Text"), htmlAttributes: new { @class = "form-control", id = "Country" })
+                @Html.ValidationMessageFor(x => x.SelectedCountry, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(x => Model.SelectedRegion, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @Html.DropDownListFor(x => Model.SelectedRegion, new SelectList(Model.Regions, "Value", "Text"), htmlAttributes: new { @class = "form-control", id = "Region" })
+                @Html.ValidationMessageFor(x => x.SelectedRegion, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="City" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="City" class="form-control" />
+            </div>
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PostalCode" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="PostalCode" class="form-control" />
+            </div>
+            <span asp-validation-for="PostalCode" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 col-md-5">
+                <input type="submit" value="Submit" class="btn btn-primary" />
+            </div>
+        </div>
+    </form>*@
