@@ -3,6 +3,7 @@
 let sourceContainerId;
 let orientation = "";
 var shipCoordinatesDictionary = new Object();
+document.getElementById('startButton').disabled = true;
 
 var dragStart = function(e) {
     try {
@@ -64,21 +65,24 @@ var dropped = function(e) {
                 return;
             }
             shipCoordinatesDictionary[shipName] = shipCoordinates;
+            //allowImageClick(shipCoordinatesDictionary);
             populateCoordinatesInForm(shipName, shipCoordinates);
             let parentCell = document.getElementById(targetCellId);
             parentCell.appendChild(document.querySelector('#' + shipName));
+            buttonStatus();
         } else {
             e.target.appendChild(document.querySelector('#' + shipName));
+            buttonStatus();
         }
     }
 }
 
 var shipsOverlap = function (shipName, newShipCoordinates, shipCoordinatesDictionary) {
-    if (typeof shipCoordinatesDictionary[shipName] !== 'undefined') {
-        delete shipCoordinatesDictionary[shipName];
-    }
     for (const coordinate of newShipCoordinates) {
         for (const [ship, existingCoordinates] of Object.entries(shipCoordinatesDictionary)) {
+            if (ship === shipName) {
+                continue;
+            }
             for (const existingCoordinate of existingCoordinates) {
                 if (coordinate == existingCoordinate) {
                     return true;
@@ -89,8 +93,17 @@ var shipsOverlap = function (shipName, newShipCoordinates, shipCoordinatesDictio
     return false;
 }
 
+var allowImageClick = function (shipCoordinatesDictionary) {
+    for (const [ship, coordinates] of Object.entries(shipCoordinatesDictionary)) {
+        for (const coordinate of coordinates) {
+            let occupiedCell = document.getElementById(coordinate);
+            occupiedCell.style.zIndex = -1;
+        }
+    }
+}
+
 var rotateShip = function (e) {
-    if (e.target.classList.contains('ship') && e.target.parentElement.classList.contains('setupCell')) {
+    if (e.target.classList.contains('ship') && e.target.parentElement.parentElement.classList.contains('divBoard')) {
         if (!e.target.classList.contains('rotate')) {
             let shipName = e.target.id;
             let targetCellId = e.target.parentElement.id;
@@ -104,6 +117,7 @@ var rotateShip = function (e) {
                 cancel(e);
                 return;
             }
+            shipCoordinatesDictionary[shipName] = shipCoordinates;
             e.target.classList.add('rotate');
             populateCoordinatesInForm(shipName, shipCoordinates);
             let parentCell = document.getElementById(targetCellId);
@@ -121,6 +135,7 @@ var rotateShip = function (e) {
                 cancel(e);
                 return;
             }
+            shipCoordinatesDictionary[shipName] = shipCoordinates;
             e.target.classList.remove('rotate');
             populateCoordinatesInForm(shipName, shipCoordinates);
             let parentCell = document.getElementById(targetCellId);
@@ -274,6 +289,17 @@ var populateCoordinatesInForm = function (shipName, coordinateArray) {
     });
 }
 
+ let buttonStatus = function() {
+    var startButton = document.getElementById('startButton');
+     let gameBoard = document.getElementById('target-container');
+     const ships = gameBoard.querySelectorAll("img");
+    if (ships.length === 5) {
+        startButton.disabled = false;
+    } else {
+        startButton.disabled = true;
+    }
+}
+
 let targets = document.querySelectorAll('[data-role="drag-drop-target"]');
 [].forEach.call(targets, function(target) {
     target.addEventListener('drop', dropped, false);
@@ -291,74 +317,3 @@ let sources = document.querySelectorAll('[draggable="true"]');
 [].forEach.call(sources, function(source) {
     source.addEventListener('dragstart', dragStart, false);
 });
-
-
-
-//// Old code to be removed prior to publishing. Keeping it here in case it is useful beforehand.
-
-//var pieceDoesNotOverlap = function (shipName, targetCell) {
-//    let cells = document.getElementsByTagName("TD");
-
-//    let occupiedCells;
-//    for (var i = 0; i < cells.length; i++) {
-//        if (cells[i].firstChild) {
-//            occupiedCells += cells[i];
-//        }
-//    }
-
-//    if (shipName === 'Destroyer') {
-//        let targetCell = document.getElementById(targetCellId);
-//        let targetCells = targetCell + targetCell.nextElementSibling;
-//    }
-
-//    if (shipName === 'Destroyer') {
-//        for (var i = 0; i < occupiedCells.length; i++) {
-//            if (targetCell === occupiedCells[i] || targetCell.nextElementSibling === occupiedCells[i]) {
-//                alert("Cell is already occupied");
-//                return false;
-//            }
-//        }
-//    }
-//}
-
-//var mergeCellsAndIds = function (shipName, targetCellId) {
-//    let cells = document.getElementsByTagName("TD");
-//    let mergedIds = "";
-
-//    for (var i = 0; i < cells.length; i++) {
-//        if (shipName === 'Destroyer' && cells[i].id === targetCellId) {
-//            if (cells[i].firstChild || cells[i].nextElementSibling.firstChild) {
-//                alert("One or more cells are already occupied")
-//                return;
-//            } else {
-//                mergedIds = cells[i].id + "," + cells[i].nextElementSibling.id;
-//                cells[i].colSpan = "2";
-//                cells[i].nextElementSibling.remove();
-//                return mergedIds;
-//            }
-//        }
-//        if (shipName === 'Cruiser' && cells[i].id === targetCellId) {
-//            mergedIds = cells[i].previousElementSibling.id + "," + cells[i].id + "," + cells[i].nextElementSibling.id;
-//            cells[i].colSpan = "3";
-//            cells[i].previousElementSibling.remove();
-//            cells[i].nextElementSibling.remove();
-//            return mergedIds;
-//        }
-//        if (shipName === 'Battleship' && cells[i].id === targetCellId) {
-//            let nextSibling = cells[i].nextElementSibling;
-//            mergedIds = cells[i].previousElementSibling.id + "," + cells[i].id + "," + nextSibling.id
-//                + "," + cells[i].nextElementSibling.nextElementSibling.id;
-//            cells[i].colSpan = "4";
-//            cells[i].previousElementSibling.remove();
-//            nextSibling.nextElementSibling.remove();
-//            nextSibling.remove();
-//            return mergedIds;
-//        }
-//    }
-//}
-
-//var populateCoordinatesInForm = function (shipName, coordinate) {
-//    var newShipName = shipName.substring(5);
-//    var shipCoordinatesInput = document.getElementById("UserFleet_" + newShipName + "__CoordinateString");
-//    shipCoordinatesInput.value = coordinates;
-//}
