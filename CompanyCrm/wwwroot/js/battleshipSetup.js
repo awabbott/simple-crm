@@ -2,8 +2,43 @@
 
 let sourceContainerId;
 let orientation = "";
-var shipCoordinatesDictionary = new Object();
+let existingCoordinates = new Object();
 document.getElementById('startButton').disabled = true;
+
+class Ship {
+    name;
+    length;
+    index;
+    orientation = "";
+    initialCoordinate = "";
+    constructor(name) {
+        this.name = name;
+        switch (name) {
+            case "Destroyer":
+                this.length = 2;
+                this.index = 0;
+                break;
+            case "Submarine":
+                this.length = 3;
+                this.index = 1;
+                break;
+            case "Cruiser":
+                this.length = 3;
+                this.index = 2;
+                break;
+            case "Battleship":
+                this.length = 4;
+                this.index = 2;
+                break;
+            case "Carrier":
+                this.length = 5;
+                this.index = 3;
+                break;
+            default:
+                break;
+        }
+    }
+}
 
 var dragStart = function(e) {
     try {
@@ -38,10 +73,8 @@ var cancel = function (e) {
     return false;
 }
 
-let originalValidTargetCellId = "";
-
-var dropped = function(e) {
-    let shipName;
+var dropped = function (e) {
+    let shipName = "";
     if (this.id !== sourceContainerId) {
         cancel(e);
         try {
@@ -57,16 +90,14 @@ var dropped = function(e) {
             if (ensureShipIsInbounds(shipName, targetCellId, orientation) !== null) {
                 targetCellId = ensureShipIsInbounds(shipName, targetCellId, orientation);
             }
-            originalValidTargetCellId = targetCellId;
-            let shipCoordinates = obtainShipCoordinatesArray(shipName, targetCellId, orientation);
-            if (shipsOverlap(shipName, shipCoordinates, shipCoordinatesDictionary)) {
+            let newCoordinates = obtainShipCoordinatesArray(shipName, targetCellId, orientation);
+            if (shipsOverlap(shipName, newCoordinates, existingCoordinates)) {
                 alert('Ships Overlap!');
                 cancel(e);
                 return;
             }
-            shipCoordinatesDictionary[shipName] = shipCoordinates;
-            //allowImageClick(shipCoordinatesDictionary);
-            populateCoordinatesInForm(shipName, shipCoordinates);
+            existingCoordinates[shipName] = newCoordinates;
+            populateCoordinatesInForm(shipName, newCoordinates);
             let parentCell = document.getElementById(targetCellId);
             parentCell.appendChild(document.querySelector('#' + shipName));
             buttonStatus();
@@ -77,29 +108,57 @@ var dropped = function(e) {
     }
 }
 
-var shipsOverlap = function (shipName, newShipCoordinates, shipCoordinatesDictionary) {
-    for (const coordinate of newShipCoordinates) {
-        for (const [ship, existingCoordinates] of Object.entries(shipCoordinatesDictionary)) {
+var dropped2 = function (e) {
+    let shipName = "";
+    if (this.id !== sourceContainerId) {
+        cancel(e);
+        try {
+            shipName = e.dataTransfer.getData('text/plain');
+        } catch (ex) {
+            shipName = e.dataTransfer.getData('Text');
+        }
+
+        const ship = new Ship(shipName);
+
+        if (e.target.tagName === 'IMG') {
+            cancel(e);
+        } else if (e.target.className === 'setupCell') {
+            ship.initialCoordinate = e.target.id;
+            if (!shipIsInbounds(ship, orientation)) {
+                ship.initialCoordinate = adjustShip(ship, orientation);
+            }
+            let newCoordinates = obtainShipCoordinatesArray(ship.name, ship.initialCoordinate, orientation);
+            if (shipsOverlap(ship.name, newCoordinates, existingCoordinates)) {
+                alert('Ships Overlap!');
+                cancel(e);
+                return;
+            }
+            existingCoordinates[ship.name] = newCoordinates;
+            populateCoordinatesInForm(ship.name, newCoordinates);
+            let parentCell = document.getElementById(ship.initialCoordinate);
+            parentCell.appendChild(document.querySelector('#' + ship.name));
+            buttonStatus();
+        } else {
+            e.target.appendChild(document.querySelector('#' + ship.name));
+            buttonStatus();
+        }
+    }
+}
+
+var shipsOverlap = function (shipName, newCoordinates, existingCoordinates) {
+    for (const newCoordinate of newCoordinates) {
+        for (const [ship, coordinates] of Object.entries(existingCoordinates)) {
             if (ship === shipName) {
                 continue;
             }
-            for (const existingCoordinate of existingCoordinates) {
-                if (coordinate == existingCoordinate) {
+            for (const coordinate of coordinates) {
+                if (newCoordinate === coordinate) {
                     return true;
                 }
             }
         }
     }
     return false;
-}
-
-var allowImageClick = function (shipCoordinatesDictionary) {
-    for (const [ship, coordinates] of Object.entries(shipCoordinatesDictionary)) {
-        for (const coordinate of coordinates) {
-            let occupiedCell = document.getElementById(coordinate);
-            occupiedCell.style.zIndex = -1;
-        }
-    }
 }
 
 var rotateShip = function (e) {
@@ -112,12 +171,12 @@ var rotateShip = function (e) {
                 targetCellId = ensureShipIsInbounds(shipName, targetCellId, orientation);
             };
             let shipCoordinates = obtainShipCoordinatesArray(shipName, targetCellId, orientation);
-            if (shipsOverlap(shipName, shipCoordinates, shipCoordinatesDictionary)) {
+            if (shipsOverlap(shipName, shipCoordinates, existingCoordinates)) {
                 alert('Ships Overlap!');
                 cancel(e);
                 return;
             }
-            shipCoordinatesDictionary[shipName] = shipCoordinates;
+            existingCoordinates[shipName] = shipCoordinates;
             e.target.classList.add('rotate');
             populateCoordinatesInForm(shipName, shipCoordinates);
             let parentCell = document.getElementById(targetCellId);
@@ -130,12 +189,12 @@ var rotateShip = function (e) {
                 targetCellId = ensureShipIsInbounds(shipName, targetCellId, orientation);
             };
             let shipCoordinates = obtainShipCoordinatesArray(shipName, targetCellId, orientation);
-            if (shipsOverlap(shipName, shipCoordinates, shipCoordinatesDictionary)) {
+            if (shipsOverlap(shipName, shipCoordinates, existingCoordinates)) {
                 alert('Ships Overlap!');
                 cancel(e);
                 return;
             }
-            shipCoordinatesDictionary[shipName] = shipCoordinates;
+            existingCoordinates[shipName] = shipCoordinates;
             e.target.classList.remove('rotate');
             populateCoordinatesInForm(shipName, shipCoordinates);
             let parentCell = document.getElementById(targetCellId);
@@ -154,8 +213,6 @@ var obtainShipCoordinatesArray = function (shipName, targetCellId, orientation) 
             shipLength = 2;
             break;
         case "Submarine":
-            shipLength = 3;
-            break;
         case "Cruiser":
             shipLength = 3;
             break;
@@ -256,6 +313,34 @@ var ensureShipIsInbounds = function (shipName, targetCellId, orientation) {
     return null;
 }
 
+//let shipIsInbounds = function (shipLength, targetCellId, orientation) {
+let shipIsInbounds = function (ship, orientation) {
+    //let targetCellRow = parseInt(targetCellId.charAt(0));
+    let targetCellRow = parseInt(ship.initialCoordinate.charAt(0));
+    let targetCellColumn = parseInt(ship.initialCoordinate.charAt(1));
+
+    if (orientation === 'horizontal' && (targetCellColumn + ship.length >= 10) ||
+        orientation === 'vertical' && (targetCellRow + ship.length <= 0)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+let adjustShip = function (ship, orientation) {
+    let targetCellRow = parseInt(ship.initialCoordinate.charAt(0));
+    let targetCellColumn = parseInt(ship.initialCoordinate.charAt(1));
+
+    if (orientation === 'horizontal') {
+        let newTargetCellId = targetCellRow.toString() + (9 - ship.length).toString();
+        return newTargetCellId;
+    } else if (orientation === 'vertical') {
+        let newTargetCellId = ship.length.toString() + targetCellColumn.toString();
+        return newTargetCellId;
+    }
+    return null;
+};
+
 var populateCoordinatesInForm = function (shipName, coordinateArray) {
     let shipIndex = 0;
     switch (shipName) {
@@ -302,7 +387,7 @@ var populateCoordinatesInForm = function (shipName, coordinateArray) {
 
 let targets = document.querySelectorAll('[data-role="drag-drop-target"]');
 [].forEach.call(targets, function(target) {
-    target.addEventListener('drop', dropped, false);
+    target.addEventListener('drop', dropped2, false);
     target.addEventListener('dragenter', dragEnter, false);
     target.addEventListener('dragover', dragOver, false);
     target.addEventListener('dragleave', dragLeave, false);
