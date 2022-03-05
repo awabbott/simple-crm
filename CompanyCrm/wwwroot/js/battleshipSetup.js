@@ -46,12 +46,6 @@ var dragStart = function (e) {
         e.dataTransfer.setData('Text', e.target.id);
     }
     sourceContainerId = this.parentElement.id;
-    //if (this.classList.contains('rotate')) {
-    //    orientation = 'vertical';
-    //} else {
-    //    orientation = 'horizontal';
-    //}
-    //orientation = (this.classList.contains('rotate')) ? "vertical" : "horizontal";
 };
 
 var dragEnter = function (e) {
@@ -73,42 +67,7 @@ var cancel = function (e) {
     return false;
 }
 
-//var dropped = function (e) {
-//    let shipName = "";
-//    if (this.id !== sourceContainerId) {
-//        cancel(e);
-//        try {
-//            shipName = e.dataTransfer.getData('text/plain');
-//        } catch (ex) {
-//            shipName = e.dataTransfer.getData('Text');
-//        }
-
-//        if (e.target.tagName === 'IMG') {
-//            cancel(e);
-//        } else if (e.target.className === 'setupCell') {
-//            let targetCellId = e.target.id;
-//            if (ensureShipIsInbounds(shipName, targetCellId, orientation) !== null) {
-//                targetCellId = ensureShipIsInbounds(shipName, targetCellId, orientation);
-//            }
-//            let newCoordinates = obtainShipCoordinatesArray(shipName, targetCellId, orientation);
-//            if (shipsOverlap(shipName, newCoordinates, existingCoordinates)) {
-//                alert('Ships Overlap!');
-//                cancel(e);
-//                return;
-//            }
-//            existingCoordinates[shipName] = newCoordinates;
-//            populateCoordinatesInForm(shipName, newCoordinates);
-//            let parentCell = document.getElementById(targetCellId);
-//            parentCell.appendChild(document.querySelector('#' + shipName));
-//            buttonStatus();
-//        } else {
-//            e.target.appendChild(document.querySelector('#' + shipName));
-//            buttonStatus();
-//        }
-//    }
-//}
-
-var dropped2 = function (e) {
+var dropped = function (e) {
     if (this.id !== sourceContainerId) {
         cancel(e);
         const ship = new Ship(e.dataTransfer.getData('text/plain'));
@@ -159,7 +118,7 @@ var rotateShip = function (e) {
             populateCoordinatesInForm(ship);
             e.target.classList.add('rotate');
             let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-            parentCell.appendChild(document.querySelector('#' + shipName));
+            parentCell.appendChild(document.querySelector('#' + ship.name));
         } else {
             const ship = new Ship(e.target.id);
             ship.orientation = 'horizontal';
@@ -178,19 +137,19 @@ var rotateShip = function (e) {
             populateCoordinatesInForm(ship);
             e.target.classList.remove('rotate');
             let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-            parentCell.appendChild(document.querySelector('#' + shipName));
+            parentCell.appendChild(document.querySelector('#' + ship.name));
         }
     }
 }
 
-var shipsOverlap = function (ship, existingCoordinates) {
+var shipsOverlap = function (ship, existingShipAndCoordinates) {
     for (const newCoordinate of ship.coordinates) {
-        for (const [ship, coordinates] of Object.entries(existingCoordinates)) {
-            if (ship === ship.name) {
+        for (const [existingShip, existingCoordinates] of Object.entries(existingShipAndCoordinates)) {
+            if (existingShip === ship.name) {
                 continue;
             }
-            for (const coordinate of coordinates) {
-                if (newCoordinate === coordinate) {
+            for (const existingCoordinate of existingCoordinates) {
+                if (newCoordinate.every((val, index) => val === existingCoordinate[index])) {
                     return true;
                 }
             }
@@ -214,8 +173,8 @@ var obtainCoordinates = function (ship) {
 }
 
 let shipIsInbounds = function (ship) {
-    if (ship.orientation === 'horizontal' && (ship.coordinates[0][1] + ship.length >= 10) ||
-        ship.orientation === 'vertical' && (ship.coordinates[0][0] - ship.length <= 0)) {
+    if (ship.orientation === 'horizontal' && (ship.coordinates[0][1] + ship.length > 9) ||
+        ship.orientation === 'vertical' && (ship.coordinates[0][0] - ship.length < 0)) {
         return false;
     } else {
         return true;
@@ -227,7 +186,7 @@ let adjustShip = function (ship) {
     if (ship.orientation === 'horizontal') {
         initialCoordinate = [ship.coordinates[0][0], (10 - ship.length)];
     } else if (ship.orientation === 'vertical') {
-        initialCoordinate = [ship.length, ship.coordinates[0][1]];
+        initialCoordinate = [(ship.length - 1), ship.coordinates[0][1]];
     }
     return initialCoordinate;
 };
@@ -254,7 +213,7 @@ let buttonStatus = function() {
 
 let targets = document.querySelectorAll('[data-role="drag-drop-target"]');
 [].forEach.call(targets, function(target) {
-    target.addEventListener('drop', dropped2, false);
+    target.addEventListener('drop', dropped, false);
     target.addEventListener('dragenter', dragEnter, false);
     target.addEventListener('dragover', dragOver, false);
     target.addEventListener('dragleave', dragLeave, false);
