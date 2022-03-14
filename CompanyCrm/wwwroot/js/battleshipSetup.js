@@ -71,26 +71,12 @@ var dropped = function (e) {
     if (this.id !== sourceContainerId) {
         cancel(e);
         const ship = new Ship(e.dataTransfer.getData('text/plain'));
-        ship.orientation = document.getElementById(ship.name).classList.contains('rotate') ? "vertical" : "horizontal";
+        ship.orientation = document.getElementById(ship.name).classList.contains('rotate') ? 'vertical' : 'horizontal';
         if (e.target.tagName === 'IMG') {
             cancel(e);
         } else if (e.target.className === 'setupCell') {
             let cellId = e.target.id;
-            ship.coordinates[0] = [Number(cellId.slice(0, 1)), Number(cellId.slice(1))];
-            if (!shipIsInbounds(ship)) {
-                ship.coordinates[0] = adjustShip(ship)
-            }
-            ship.coordinates = obtainCoordinates(ship);
-            if (shipsOverlap(ship, existingCoordinates)) {
-                alert('Ships Overlap!');
-                cancel(e);
-                return;
-            }
-            existingCoordinates[ship.name] = ship.coordinates;
-            populateCoordinatesInForm(ship);
-            let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-            parentCell.appendChild(document.querySelector('#' + ship.name));
-            buttonStatus();
+            placeShip(ship, cellId);
         } else {
             e.target.appendChild(document.querySelector('#' + ship.name));
             buttonStatus();
@@ -104,10 +90,8 @@ var rotateShip = function (e) {
             const ship = new Ship(e.target.id);
             ship.orientation = 'vertical';
             let cellId = e.target.parentElement.id;
-            ship.coordinates[0] = [Number(cellId.slice(0, 1)), Number(cellId.slice(1))];
-            if (!shipIsInbounds(ship)) {
-                ship.coordinates[0] = adjustShip(ship)
-            }
+            //placeShip(ship, cellId);
+            ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
             ship.coordinates = obtainCoordinates(ship);
             if (shipsOverlap(ship, existingCoordinates)) {
                 alert('Ships Overlap!');
@@ -123,10 +107,8 @@ var rotateShip = function (e) {
             const ship = new Ship(e.target.id);
             ship.orientation = 'horizontal';
             let cellId = e.target.parentElement.id;
-            ship.coordinates[0] = [Number(cellId.slice(0, 1)), Number(cellId.slice(1))];
-            if (!shipIsInbounds(ship)) {
-                ship.coordinates[0] = adjustShip(ship)
-            }
+            //placeShip(ship, cellId);
+            ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
             ship.coordinates = obtainCoordinates(ship);
             if (shipsOverlap(ship, existingCoordinates)) {
                 alert('Ships Overlap!');
@@ -140,6 +122,20 @@ var rotateShip = function (e) {
             parentCell.appendChild(document.querySelector('#' + ship.name));
         }
     }
+}
+
+let placeShip = function (ship, cellId) {
+    ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
+    ship.coordinates = obtainCoordinates(ship);
+    if (shipsOverlap(ship, existingCoordinates)) {
+        alert('Ships Overlap!');
+        return;
+    }
+    existingCoordinates[ship.name] = ship.coordinates;
+    populateCoordinatesInForm(ship);
+    let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
+    parentCell.appendChild(document.querySelector('#' + ship.name));
+    buttonStatus();
 }
 
 var shipsOverlap = function (ship, existingShipAndCoordinates) {
@@ -162,33 +158,31 @@ var obtainCoordinates = function (ship) {
     let coordinates = [ship.coordinates[0]];
     if (ship.orientation === 'horizontal') {
         for (var i = 1; i < ship.length; i++) {
-            coordinates.push([ship.coordinates[0][0], (ship.coordinates[0][1] + i)]);
+            coordinates.push([Number(ship.coordinates[0][0]), (ship.coordinates[0][1] + i)]);
         }
     } else if (ship.orientation === 'vertical') {
         for (var i = 1; i < ship.length; i++) {
-            coordinates.push([(ship.coordinates[0][0] - i), ship.coordinates[0][1]]);
+            coordinates.push([(ship.coordinates[0][0] - i), Number(ship.coordinates[0][1])]);
         }
     }
     return coordinates;
 }
 
-let shipIsInbounds = function (ship) {
-    if (ship.orientation === 'horizontal' && (ship.coordinates[0][1] + ship.length > 9) ||
-        ship.orientation === 'vertical' && (ship.coordinates[0][0] - ship.length < 0)) {
+let shipIsInbounds = function (ship, initialCoordinate) {
+    if (ship.orientation === 'horizontal' && (parseInt(initialCoordinate[1]) + ship.length > 9) ||
+        ship.orientation === 'vertical' && (parseInt(initialCoordinate[0]) - ship.length < 0)) {
         return false;
     } else {
         return true;
     }
 }
 
-let adjustShip = function (ship) {
-    let initialCoordinate = ship.coordinates[0];
+let adjustShip = function (ship, initialCoordinate) {
     if (ship.orientation === 'horizontal') {
-        initialCoordinate = [ship.coordinates[0][0], (10 - ship.length)];
+        return [Number(initialCoordinate[0]), (10 - ship.length)];
     } else if (ship.orientation === 'vertical') {
-        initialCoordinate = [(ship.length - 1), ship.coordinates[0][1]];
+        return [(ship.length - 1), Number(initialCoordinate[1])];
     }
-    return initialCoordinate;
 };
 
 var populateCoordinatesInForm = function (ship) {
