@@ -91,11 +91,13 @@ var rotateShip = function (e) {
             ship.orientation = 'vertical';
             let cellId = e.target.parentElement.id;
             //placeShip(ship, cellId);
+            //if (existingCoordinates[ship.name]) {
+            //    e.target.classList.add('rotate');
+            //}
             ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
             ship.coordinates = obtainCoordinates(ship);
             if (shipsOverlap(ship, existingCoordinates)) {
                 alert('Ships Overlap!');
-                cancel(e);
                 return;
             }
             existingCoordinates[ship.name] = ship.coordinates;
@@ -108,11 +110,13 @@ var rotateShip = function (e) {
             ship.orientation = 'horizontal';
             let cellId = e.target.parentElement.id;
             //placeShip(ship, cellId);
+            //if (existingCoordinates[ship.name]) {
+            //    e.target.classList.remove('rotate');
+            //}
             ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
             ship.coordinates = obtainCoordinates(ship);
             if (shipsOverlap(ship, existingCoordinates)) {
                 alert('Ships Overlap!');
-                cancel(e);
                 return;
             }
             existingCoordinates[ship.name] = ship.coordinates;
@@ -130,12 +134,13 @@ let placeShip = function (ship, cellId) {
     if (shipsOverlap(ship, existingCoordinates)) {
         alert('Ships Overlap!');
         return;
+    } else {
+        existingCoordinates[ship.name] = ship.coordinates;
+        populateCoordinatesInForm(ship);
+        let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
+        parentCell.appendChild(document.querySelector('#' + ship.name));
+        buttonStatus();
     }
-    existingCoordinates[ship.name] = ship.coordinates;
-    populateCoordinatesInForm(ship);
-    let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-    parentCell.appendChild(document.querySelector('#' + ship.name));
-    buttonStatus();
 }
 
 var shipsOverlap = function (ship, existingShipAndCoordinates) {
