@@ -79,51 +79,43 @@ var dropped = function (e) {
             placeShip(ship, cellId);
         } else {
             e.target.appendChild(document.querySelector('#' + ship.name));
-            buttonStatus();
         }
+        buttonStatus();
     }
 }
 
 var rotateShip = function (e) {
     if (e.target.classList.contains('ship') && e.target.parentElement.parentElement.classList.contains('divBoard')) {
-        if (!e.target.classList.contains('rotate')) {
-            const ship = new Ship(e.target.id);
-            ship.orientation = 'vertical';
-            let cellId = e.target.parentElement.id;
-            //placeShip(ship, cellId);
-            //if (existingCoordinates[ship.name]) {
-            //    e.target.classList.add('rotate');
-            //}
-            ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
-            ship.coordinates = obtainCoordinates(ship);
-            if (shipsOverlap(ship, existingCoordinates)) {
-                alert('Ships Overlap!');
-                return;
-            }
-            existingCoordinates[ship.name] = ship.coordinates;
-            populateCoordinatesInForm(ship);
-            e.target.classList.add('rotate');
-            let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-            parentCell.appendChild(document.querySelector('#' + ship.name));
-        } else {
-            const ship = new Ship(e.target.id);
+        const ship = new Ship(e.target.id);
+        let cellId = e.target.parentElement.id;
+        if (e.target.classList.contains('rotate')) {
             ship.orientation = 'horizontal';
-            let cellId = e.target.parentElement.id;
-            //placeShip(ship, cellId);
-            //if (existingCoordinates[ship.name]) {
-            //    e.target.classList.remove('rotate');
-            //}
             ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
             ship.coordinates = obtainCoordinates(ship);
             if (shipsOverlap(ship, existingCoordinates)) {
                 alert('Ships Overlap!');
                 return;
+            } else {
+                existingCoordinates[ship.name] = ship.coordinates;
+                populateCoordinatesInForm(ship);
+                e.target.classList.remove('rotate');
+                let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
+                parentCell.appendChild(document.querySelector('#' + ship.name));
             }
-            existingCoordinates[ship.name] = ship.coordinates;
-            populateCoordinatesInForm(ship);
-            e.target.classList.remove('rotate');
-            let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
-            parentCell.appendChild(document.querySelector('#' + ship.name));
+        } else {
+            ship.orientation = 'vertical';
+            ship.coordinates[0] = shipIsInbounds(ship, cellId) ? [Number(cellId[0]), Number(cellId[1])] : adjustShip(ship, cellId);
+            ship.coordinates = obtainCoordinates(ship);
+            if (shipsOverlap(ship, existingCoordinates)) {
+                alert('Ships Overlap!');
+                return;
+            } else {
+                existingCoordinates[ship.name] = ship.coordinates;
+                populateCoordinatesInForm(ship);
+                e.target.classList.add('rotate');
+                let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
+                parentCell.appendChild(document.querySelector('#' + ship.name));
+            }
         }
     }
 }
@@ -139,7 +131,6 @@ let placeShip = function (ship, cellId) {
         populateCoordinatesInForm(ship);
         let parentCell = document.getElementById(ship.coordinates[0][0].toString() + ship.coordinates[0][1].toString());
         parentCell.appendChild(document.querySelector('#' + ship.name));
-        buttonStatus();
     }
 }
 
